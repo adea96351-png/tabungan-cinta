@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tabungan Cinta Ade & Sarah</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- ANIMASI -->
+<div class="love" style="left:5%">💛</div>
+<div class="love" style="left:15%; animation-delay:2s;">✨</div>
+<div class="love" style="left:30%; animation-delay:4s;">💛</div>
+<div class="love" style="left:50%; animation-delay:1s;">✨</div>
+<div class="love" style="left:70%; animation-delay:3s;">💛</div>
+<div class="love" style="left:85%; animation-delay:5s;">✨</div>
+
+<div class="container">
+
+    <!-- JUDUL -->
+    <div class="title-box">
+
+        <img src="foto 1.jpeg" class="foto">
+
+        <div>
+            <h1>💛 Tabungan Cinta 💛</h1>
+
+            <p class="sub">
+                Ade Asad & Siti Sarah ✨<br>
+                Menabung bersama demi masa depan indah
+            </p>
+        </div>
+
+        <img src="foto 2.jpeg" class="foto">
+
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="target-box">
+
+        <h3>🎉 Progress Tabungan</h3>
+
+        <div class="progress-box">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <p id="persen"></p>
+
+    </div>
+
+    <!-- INPUT -->
+    <div class="input-box">
+        <input type="date" id="tanggal">
+
+        <input
+            type="number"
+            id="nominal"
+            placeholder="Nominal Tabungan"
+        >
+
+        <button onclick="tambahData()">
+            Tambah
+        </button>
+    </div>
+
+    <!-- TABEL -->
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Hari</th>
+                    <th>Tanggal</th>
+                    <th>Bulan</th>
+                    <th>Tahun</th>
+                    <th>Nominal</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+
+            <tbody id="dataTabungan">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- TOTAL -->
+    <div class="total-box">
+        <h3>Total Tabungan</h3>
+        <h2 id="total">Rp0</h2>
+    </div>
+
+    <!-- GRAFIK -->
+    <div class="chart-box">
+        <canvas id="myChart"></canvas>
+    </div>
+
+</div>
+
+<!-- MUSIK -->
+<audio id="musik" loop>
+    <source src="musik 1.mp3" type="audio/mp3">
+</audio>
+<audio id="coinSound">
+    <source src="coin 1.mp3" type="audio/mp3">
+</audio>
+
+<script src="script.js"></script>
+<script>
+
+document.body.addEventListener("click", function () {
+
+    const musik =
+    document.getElementById("musik");
+
+    musik.play();
+
+}, { once: true });
+
+</script>   
+</body>
+</html>
