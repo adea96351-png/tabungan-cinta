@@ -1,50 +1,107 @@
-let total = localStorage.getItem("total")
-    ? parseInt(localStorage.getItem("total"))
-    : 0;
+// FIREBASE
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
-let dataTabungan = localStorage.getItem("data")
-    ? JSON.parse(localStorage.getItem("data"))
-    : [];
+import {
+    getDatabase,
+    ref,
+    push,
+    onValue,
+    remove
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-const tbody =
-document.getElementById("dataTabungan");
+// CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyBAOwhsFOpIoc-8qAq9otKallKaG2qQ0Qo",
+  authDomain: "tabungan-cinta.firebaseapp.com",
+  databaseURL: "https://tabungan-cinta-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "tabungan-cinta",
+  storageBucket: "tabungan-cinta.firebasestorage.app",
+  messagingSenderId: "943179599825",
+  appId: "1:943179599825:web:c638eee37126c11af5daf0",
+  measurementId: "G-B0Z6SFTYYV"
+};
 
-function tampilkanData(){
+// INIT
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getDatabase(app);
+
+const dataRef =
+ref(db,"tabungan");
+
+let total = 0;
+
+let chart;
+
+// TAMPILKAN DATA REALTIME
+onValue(dataRef,(snapshot)=>{
+
+    const data = snapshot.val();
+
+    const tbody =
+    document.getElementById("dataTabungan");
 
     tbody.innerHTML = "";
 
-    dataTabungan.forEach((item,index)=>{
+    total = 0;
+
+    let labels = [];
+
+    let nominalData = [];
+
+    let no = 1;
+
+    for(let id in data){
+
+        const item = data[id];
+
+        total += item.nominal;
+
+        labels.push("Data "+no);
+
+        nominalData.push(item.nominal);
 
         tbody.innerHTML += `
         <tr>
-            <td>${index+1}</td>
+            <td>${no}</td>
             <td>${item.hari}</td>
             <td>${item.tanggal}</td>
             <td>${item.bulan}</td>
             <td>${item.tahun}</td>
+
             <td>
-                Rp${item.nominal.toLocaleString('id-ID')}
+            Rp${item.nominal.toLocaleString('id-ID')}
             </td>
 
             <td>
-                <button onclick="hapusData(${index})">
+                <button onclick="hapusData('${id}')">
                     Hapus
                 </button>
             </td>
         </tr>
         `;
-    });
+
+        no++;
+    }
 
     document.getElementById("total")
     .innerText =
-    "Rp" + total.toLocaleString('id-ID');
+    "Rp"+total.toLocaleString('id-ID');
 
-    updateProgress();
+    document.getElementById("persen")
+    .innerText =
+    "Total tabungan sekarang Rp "
+    + total.toLocaleString('id-ID');
 
-    updateChart();
-}
+    updateChart(labels,nominalData);
+});
 
-function tambahData(){
+// TAMBAH DATA
+window.tambahData = function(){
 
     const tanggalInput =
     document.getElementById("tanggal").value;
@@ -53,16 +110,18 @@ function tambahData(){
     parseInt(
     document.getElementById("nominal").value
     );
-const coin =
-document.getElementById("coinSound");
 
-coin.currentTime = 0;
-
-coin.play();
     if(tanggalInput === "" || isNaN(nominal)){
         alert("Isi tanggal dan nominal!");
         return;
     }
+
+    const coin =
+    document.getElementById("coinSound");
+
+    coin.currentTime = 0;
+
+    coin.play();
 
     const tanggalObj =
     new Date(tanggalInput);
@@ -85,7 +144,7 @@ coin.play();
     const tahun =
     tanggalObj.getFullYear();
 
-    dataTabungan.push({
+    push(dataRef,{
         hari,
         tanggal,
         bulan,
@@ -93,124 +152,50 @@ coin.play();
         nominal
     });
 
-    total += nominal;
-
-    localStorage.setItem(
-        "data",
-        JSON.stringify(dataTabungan)
-    );
-
-    localStorage.setItem(
-        "total",
-        total
-    );
-
-    tampilkanData();
-
     document.getElementById("tanggal").value="";
     document.getElementById("nominal").value="";
 }
 
-/* PROGRESS TANPA TARGET */
-function updateProgress(){
+// HAPUS DATA
+window.hapusData = function(id){
 
-    let persen = total / 100000;
-
-    if(persen > 100){
-        persen = 100;
-    }
-
-    document.getElementById("progress")
-    .style.width = persen + "%";
-
-    document.getElementById("persen")
-    .innerText =
-    "Total tabungan sekarang Rp "
-    + total.toLocaleString('id-ID');
+    remove(ref(db,"tabungan/"+id));
 }
 
-/* GRAFIK */
-let chart;
-
-function updateChart(){
+// GRAFIK
+function updateChart(labels,nominal){
 
     const ctx =
     document.getElementById("myChart");
-
-    const labels =
-    dataTabungan.map((d,i)=>
-        "Data "+(i+1)
-    );
-
-    const nominal =
-    dataTabungan.map(d=>d.nominal);
 
     if(chart){
         chart.destroy();
     }
 
- chart = new Chart(ctx, {
+    chart = new Chart(ctx,{
 
-    type: 'line',
+        type:'line',
 
-    data: {
-        labels: labels,
+        data:{
+            labels:labels,
 
-        datasets: [{
-            label: 'Tabungan Ade & Sarah 💛',
+            datasets:[{
+                label:'Tabungan Ade & Sarah 💛',
 
-            data: nominal,
+                data:nominal,
 
-            borderWidth: 4,
+                borderWidth:4,
 
-            tension: 0.5,
+                tension:0.5,
 
-            fill: true,
+                fill:true,
 
-            pointRadius: 5,
-
-            pointHoverRadius: 8
-        }]
-    },
-
-    options: {
-
-        responsive: true,
-
-        plugins: {
-            legend: {
-                display: true
-            }
+                pointRadius:5
+            }]
         },
 
-        scales: {
-
-            y: {
-                beginAtZero: true
-            }
-
+        options:{
+            responsive:true
         }
-
-    }
-});
-}
-
-tampilkanData();
-function hapusData(index){
-
-    total -= dataTabungan[index].nominal;
-
-    dataTabungan.splice(index,1);
-
-    localStorage.setItem(
-        "data",
-        JSON.stringify(dataTabungan)
-    );
-
-    localStorage.setItem(
-        "total",
-        total
-    );
-
-    tampilkanData();
+    });
 }
